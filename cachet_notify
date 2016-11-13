@@ -114,6 +114,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 			echo 'Can\'t update component' . "\n";
 			exit(1);
 		}
+	}
 } elseif ($service_status != 'OK' && $service_status_type == 'HARD') { // Something went wrong, let's notify
 	echo 'KO HARD: creating incident' . "\n";
 	if($service_status == 'WARNING'){
