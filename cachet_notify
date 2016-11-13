@@ -122,7 +122,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 } elseif ($service_status == 'OK' && $service_status_type == 'SOFT') { // Recovery underway
 	echo 'OK SOFT: updating incident' . "\n";
 	/* Get the incident ID */
-	$results = cachet_query('incidents');
+	$results = cachet_query('incidents?component_id='.$cachet_component_id);
 	if ($result['code'] != 200) {
 		echo 'Can\'t get incidents' . "\n";
 		exit(1);
@@ -157,7 +157,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 } elseif ($service_status == 'OK' && $service_status_type == 'HARD') { // Recovery completed
 	echo 'OK HARD: updating incident' . "\n";
 	/* Get the incident ID */
-	$results = cachet_query('incidents');
+	$results = cachet_query('incidents?component_id='.$cachet_component_id);
 	if ($result['code'] != 200) {
 		echo 'Can\'t get incidents' . "\n";
 		exit(1);
