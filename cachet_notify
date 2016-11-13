@@ -70,10 +70,12 @@ if ($result['code'] != 200) {
 	echo 'Can\'t query components' . "\n";
 	exit(1);
 }
+$cachet_component_status = 0;
 $cachet_component_id = false;
 foreach ($result['body']->data as $component) {
 	if ($cachet_component == $component->name) { // We nailed it
 		$cachet_component_id = $component->id;
+		$cachet_component_status = $component->status;
 		break; // Yes, bad.
 	}
 }
@@ -160,6 +162,17 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	if ($cachet_incident_id === false) {
 		echo 'Can\'t find incident "' . $incident_prefix . ' ' . $service_name . '"' . "\n";
+		if(cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
+			$query = array(
+				'id' => $cachet_component_id,
+				'status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
+			);
+			$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+			if ($result['code'] != 200) {
+				echo 'Can\'t update component' . "\n";
+				exit(1);
+			}
+		}
 		exit(1);
 	}
 
@@ -195,6 +208,17 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	if ($cachet_incident_id === false) {
 		echo 'Can\'t find incident "' . $incident_prefix . ' ' . $service_name . '"' . "\n";
+		if(cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
+			$query = array(
+				'id' => $cachet_component_id,
+				'status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
+			);
+			$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+			if ($result['code'] != 200) {
+				echo 'Can\'t update component' . "\n";
+				exit(1);
+			}
+		}
 		exit(1);
 	}
 
