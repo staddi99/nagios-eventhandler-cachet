@@ -94,30 +94,53 @@ RECOVERY = OK
 */
 if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will be back soon
 	echo 'KO SOFT: updating component' . "\n";
-	$query = array(
-		'id' => $cachet_component_id,
-		'status' => CACHET_COMPONENT_STATUS_PARTIAL_OUTAGE,
-	);
-	$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
-	if ($result['code'] != 200) {
-		echo 'Can\'t update component' . "\n";
-		exit(1);
-	}
+	if($service_status == 'WARNING'){
+		$query = array(
+			'id' => $cachet_component_id,
+			'status' => CACHET_COMPONENT_STATUS_PERFORMANCE_ISSUES,
+		);
+		$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+		if ($result['code'] != 200) {
+			echo 'Can\'t update component' . "\n";
+			exit(1);
+		}
+	} else {
+		$query = array(
+			'id' => $cachet_component_id,
+			'status' => CACHET_COMPONENT_STATUS_PARTIAL_OUTAGE,
+		);
+		$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+		if ($result['code'] != 200) {
+			echo 'Can\'t update component' . "\n";
+			exit(1);
+		}
 } elseif ($service_status != 'OK' && $service_status_type == 'HARD') { // Something went wrong, let's notify
 	echo 'KO HARD: creating incident' . "\n";
-	$query = array(
-		'name' => $incident_prefix . ' ' . $service_name,
-		'message' => $service_output,
-		'status' => CACHET_STATUS_INVESTIGATING,
-                'visible' => $cachet_incident_visible,
-		'component_id' => $cachet_component_id,
-                'component_status' => CACHET_COMPONENT_STATUS_MAJOR_OUTAGE,
-		'notify' => $cachet_notify_subscribers,
-	);
-	$result = cachet_query('incidents', 'POST', $query);
-	if ($result['code'] != 200) {
-		echo 'Can\'t create incident' . "\n";
-		exit(1);
+	if($service_status == 'WARNING'){
+		$query = array(
+			'id' => $cachet_component_id,
+			'status' => CACHET_COMPONENT_STATUS_PERFORMANCE_ISSUES,
+		);
+		$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+		if ($result['code'] != 200) {
+			echo 'Can\'t update component' . "\n";
+			exit(1);
+		}
+	} else {
+		$query = array(
+			'name' => $incident_prefix . ' ' . $service_name,
+			'message' => $service_output,
+			'status' => CACHET_STATUS_INVESTIGATING,
+	                'visible' => $cachet_incident_visible,
+			'component_id' => $cachet_component_id,
+	                'component_status' => CACHET_COMPONENT_STATUS_MAJOR_OUTAGE,
+			'notify' => $cachet_notify_subscribers,
+		);
+		$result = cachet_query('incidents', 'POST', $query);
+		if ($result['code'] != 200) {
+			echo 'Can\'t create incident' . "\n";
+			exit(1);
+		}
 	}
 } elseif ($service_status == 'OK' && $service_status_type == 'SOFT') { // Recovery underway
 	echo 'OK SOFT: updating incident' . "\n";
