@@ -14,6 +14,7 @@ $cachet_notify_subscribers = true; // Enable subscribers notifcation for inciden
 $cachet_incident_visible = true;
 
 $cachet_component = $argv[1];
+$cachet_component_name = str_replace(' ', '%20', $cachet_component);
 $service_name = $argv[2];
 $service_status = $argv[3];
 $service_status_type = $argv[4];
@@ -64,7 +65,7 @@ function cachet_query($api_part, $action = 'GET', $data = null) {
 }
 
 /* Find Cachet component ID */
-$result = cachet_query('components?name='.$cachet_component);
+$result = cachet_query('components?name='.$cachet_component_name);
 if ($result['code'] != 200) {
 	echo 'Can\'t query components' . "\n";
 	exit(1);
