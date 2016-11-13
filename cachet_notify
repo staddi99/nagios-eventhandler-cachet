@@ -93,8 +93,16 @@ PROBLEM = !OK = (WARNING | CRITICAL | UNKONWN)
 RECOVERY = OK
 */
 if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will be back soon
-	echo 'KO SOFT: not doing anything' . "\n";
-	exit(0);
+	echo 'KO SOFT: updating component' . "\n";
+	$query = array(
+		'id' => $cachet_component_id,
+		'status' => CACHET_COMPONENT_STATUS_PARTIAL_OUTAGE,
+	);
+	$result = cachet_query('components/' . $cachet_component_id, 'PUT', $query);
+	if ($result['code'] != 200) {
+		echo 'Can\'t update component' . "\n";
+		exit(1);
+	}
 } elseif ($service_status != 'OK' && $service_status_type == 'HARD') { // Something went wrong, let's notify
 	echo 'KO HARD: creating incident' . "\n";
 	$query = array(
@@ -121,7 +129,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	$cachet_incident_id = false;
 	foreach ($results['body']->data as $incident) {
-		if ($incident->name == $incident_prefix . ' ' . $service_name) {
+		if ($incident->name == $incident_prefix . ' ' . $service_name && $incident->status != "4") {
 			$cachet_incident_id = $incident->id;
 			break; // Yes, bad.
 		}
@@ -156,7 +164,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	$cachet_incident_id = false;
 	foreach ($results['body']->data as $incident) {
-		if ($incident->name == $incident_prefix . ' ' . $service_name) {
+		if ($incident->name == $incident_prefix . ' ' . $service_name && $incident->status != "4") {
 			$cachet_incident_id = $incident->id;
 			break; // Yes, bad.
 		}
