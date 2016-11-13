@@ -64,7 +64,7 @@ function cachet_query($api_part, $action = 'GET', $data = null) {
 }
 
 /* Find Cachet component ID */
-$result = cachet_query('components');
+$result = cachet_query('components?name='.$cachet_component);
 if ($result['code'] != 200) {
 	echo 'Can\'t query components' . "\n";
 	exit(1);
