@@ -1,4 +1,4 @@
-#!/usr/bin/php5
+#!/usr/bin/php
 <?php
 
 if ($argc != 6) {
@@ -118,7 +118,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 		}
 	}
 } elseif ($service_status != 'OK' && $service_status_type == 'HARD') { // Something went wrong, let's notify
-	echo 'KO HARD: creating incident' . "\n";
+	echo 'OK HARD: creating incident' . "\n";
 	if($service_status == 'WARNING'){
 		$query = array(
 			'id' => $cachet_component_id,
@@ -162,7 +162,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	if ($cachet_incident_id === false) {
 		echo 'Can\'t find incident "' . $incident_prefix . ' ' . $service_name . '"' . "\n";
-		if(cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
+		if($cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
 			$query = array(
 				'id' => $cachet_component_id,
 				'status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
@@ -178,16 +178,16 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 
 	/* Update the incident */
 	$query = array(
-		'name' => $incident_prefix . ' ' . $service_name,
-		'message' => $service_output,
-		'status' => CACHET_STATUS_WATCHING,
-                'visible' => $cachet_incident_visible,
 		'component_id' => $cachet_component_id,
-                'component_status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
-		'notify' => $cachet_notify_subscribers,
+		'component_status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
+	);
+	$query2 = array(
+		'status' => CACHET_STATUS_WATCHING,
+		'message' => $service_output,
 	);
 	$result = cachet_query('incidents/' . $cachet_incident_id, 'PUT', $query);
-	if ($result['code'] != 200) {
+	$result2 = cachet_query('incidents/' . $cachet_incident_id . '/updates', 'POST', $query2);
+	if ($result['code'] != 200 || $result2['code'] != 200) {
 		echo 'Can\'t update incident' . "\n";
 		exit(1);
 	}
@@ -208,7 +208,7 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 	}
 	if ($cachet_incident_id === false) {
 		echo 'Can\'t find incident "' . $incident_prefix . ' ' . $service_name . '"' . "\n";
-		if(cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
+		if($cachet_component_status != CACHET_COMPONENT_STATUS_OPERATIONAL){
 			$query = array(
 				'id' => $cachet_component_id,
 				'status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
@@ -224,16 +224,16 @@ if ($service_status != 'OK' && $service_status_type == 'SOFT') { // Hope it will
 
 	/* Update the incident */
 	$query = array(
-		'name' => $incident_prefix . ' ' . $service_name,
-		'message' => $service_output,
-		'status' => CACHET_STATUS_FIXED,
-                'visible' => $cachet_incident_visible,
 		'component_id' => $cachet_component_id,
-                'component_status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
-		'notify' => $cachet_notify_subscribers,
+		'component_status' => CACHET_COMPONENT_STATUS_OPERATIONAL,
+	);
+	$query2 = array(
+		'status' => CACHET_STATUS_FIXED,
+		'message' => $service_output,
 	);
 	$result = cachet_query('incidents/' . $cachet_incident_id, 'PUT', $query);
-	if ($result['code'] != 200) {
+	$result2 = cachet_query('incidents/' . $cachet_incident_id . '/updates', 'POST', $query2);
+	if ($result['code'] != 200 || $result2['code'] != 200) {
 		echo 'Can\'t update incident' . "\n";
 		exit(1);
 	}
